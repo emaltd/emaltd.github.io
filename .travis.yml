@@ -1,0 +1,46 @@
+language: java
+
+sudo: required
+
+jdk:
+  - oraclejdk8
+
+services:
+  - docker
+
+# some npm modules need a newer g++ compiler
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-6
+    - g++-6
+env:
+  - CXX=g++-6
+
+script:
+  - ./gradlew assemble check &&
+    docker build -t georocket/georocket-website . &&
+    if [ "$TRAVIS_REPO_SLUG" == "georocket/georocket-website" ] && ([ "$TRAVIS_BRANCH" == "master" ] || [ ! -z "$TRAVIS_TAG" ]) && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
+    docker push georocket/georocket-website;
+    fi
+
+notifications:
+  slack:
+    on_pull_requests: false
+    on_success: always
+    rooms:
+      secure: nrXn+zxR8CljwPU1OavclSIXhurabMlYq3oNkNg16s2+Na7/1zBJeBuiQOFhNx2vqiHNQZTDOYHKnekr3vm/9Ujhl9IrB9vsyHFzRL+YFJ3Lvzes2sS4wsRLitNtotgJRAXMWNmitpsm/4sy7sqEJPWvMQ5BnDSGkQ1PRbCbWDGpS08mr+FipnTsiCz7wWAvBTmyRldtlRPKE+MK4r5/uMO7hACtBnADDn/CzwHuBa+pU1255oUZ4Cwe4/a//BLPlfkscLRhPFYC9EMpF4kTPovKpkO1MKm0dIOtP0/hubCZp9sfLp/yagDcbQmNvc0mnrT3FdyRGAHcfnNWyQ1oVvOX2DkR03nhvUUvsYSZv8fk28HRtfanyWC/UT7PWOR6kItw2DJNGPtDUw47RiMS4zVAs3UEhkw04ciPwL38JcS7donGU+fjGrpnoeke5kX4qfI6uw5tw8tEZUzo+QW6TxE7F76XHHIQhegIEXAi9JEecsGzn3qNU0bT9FeKwmLaECiKcI7MtoeyG9P17w7GXLNMbKHmXsGd9I/KGjFCVZkeafJrMCyZK/ZBRh/dUEdajM1unCkXVplACemgdSK7L+UAhj4DEJHsdYKUCw/vUn42ieq9C0Ll4Jr+KLsMqT+vtJo3HCHpnSbYeFdgA9aUVQD/tf+566H8XosHYr6BMsk=
+
+# see also https://docs.travis-ci.com/user/languages/java/#Caching
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.npm
+    - .gradle

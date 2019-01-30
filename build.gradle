@@ -1,0 +1,173 @@
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.7'
+    id 'com.github.ben-manes.versions' version '0.17.0'
+    id "com.moowork.gulp" version "1.2.0"
+    id "com.moowork.node" version "1.2.0"
+    id "de.undercouch.download" version "3.3.0"
+}
+
+apply plugin: 'org.asciidoctor.convert'
+
+import org.apache.tools.ant.filters.ConcatFilter
+
+ext {
+    docsSources = new File(buildDir, "docs-sources")
+    docs = new File(buildDir, "docs")
+    src = new File("src")
+    srcGen = new File(buildDir, "src-gen")
+    userDocsDest = new File(src, "docs/user-documentation")
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+configurations {
+    docs_1_0_0 {
+        transitive = false
+    }
+
+    docs_1_1_0 {
+        transitive = false
+    }
+
+    docs_1_2_0 {
+        transitive = false
+    }
+
+    docs_1_3_0 {
+        transitive = false
+    }
+
+    docs_1_3_1 {
+        transitive = false
+    }
+}
+
+dependencies {
+    // 1.0.0
+    docs_1_0_0 "io.georocket:georocket-docs:1.0.0:sources"
+    docs_1_0_0 "io.georocket:georocket-client-api:1.0.0:javadoc"
+    docs_1_0_0 "io.georocket:georocket-server-api:1.0.0:javadoc"
+
+    // 1.1.0
+    docs_1_1_0 "io.georocket:georocket-docs:1.1.0:sources"
+    docs_1_1_0 "io.georocket:georocket-client-api:1.1.0:javadoc"
+    docs_1_1_0 "io.georocket:georocket-server-api:1.1.0:javadoc"
+
+    // 1.2.0
+    docs_1_2_0 "io.georocket:georocket-docs:1.2.0:sources"
+    docs_1_2_0 "io.georocket:georocket-client-api:1.2.0:javadoc"
+    docs_1_2_0 "io.georocket:georocket-server-api:1.2.0:javadoc"
+
+    // 1.3.0
+    docs_1_3_0 "io.georocket:georocket-docs:1.3.0:sources"
+    docs_1_3_0 "io.georocket:georocket-client-api:1.3.0:javadoc"
+    docs_1_3_0 "io.georocket:georocket-server-api:1.3.0:javadoc"
+
+    // 1.3.1-SNAPSHOT
+    docs_1_3_1 "io.georocket:georocket-docs:1.3.1-SNAPSHOT:sources"
+    docs_1_3_1 "io.georocket:georocket-client-api:1.3.1-SNAPSHOT:javadoc"
+    docs_1_3_1 "io.georocket:georocket-server-api:1.3.1-SNAPSHOT:javadoc"
+}
+
+gulp {
+    colors = true
+}
+
+node {
+    version = new File(projectDir, ".nvmrc").text.trim()
+    download = true
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.8.1'
+}
+
+task extractDocs {
+    doLast {
+        // extract each 'docs' artifact to a separate directory
+        [configurations.docs_1_0_0, configurations.docs_1_1_0,
+        configurations.docs_1_2_0, configurations.docs_1_3_0,
+        configurations.docs_1_3_1].each { cfg ->
+            cfg.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                copy {
+                    from zipTree(artifact.file)
+                    into new File(new File(docsSources, artifact.name), artifact.moduleVersion.id.version)
+                }
+            }
+        }
+    }
+}
+
+task copyDocs(dependsOn: [extractDocs, asciidoctor]) {
+    doLast {
+        // copy latest version of user documentation
+        copy {
+            from new File(asciidoctor.outputDir, "html5/1.3.0")
+            into new File(srcGen, "georocket-docs-html")
+        }
+
+        // copy all versions of user documentation
+        copy {
+            from new File(asciidoctor.outputDir, "html5")
+            into new File(srcGen, "georocket-docs-html")
+        }
+
+        // copy client API
+        copy {
+            from new File(docsSources, "georocket-client-api")
+            into new File(docs, "api/client")
+        }
+
+        // copy server API
+        copy {
+            from new File(docsSources, "georocket-server-api")
+            into new File(docs, "api/server")
+        }
+    }
+}
+
+task prepareUserDocs(dependsOn: [copyDocs]) {
+    doLast {
+        copy {
+            from new File(srcGen, "georocket-docs-html")
+            into userDocsDest
+        }
+    }
+}
+
+task cleanUserDocs(type: Delete) {
+    delete userDocsDest
+}
+
+task cleanNodeModules(type: Delete) {
+    delete new File(projectDir, "node_modules")
+}
+
+asciidoctor {
+    sourceDir new File(docsSources, "georocket-docs")
+    options template_dirs: ["${projectDir}/asciidoctor-backends"]
+
+    resources {
+        from(sourceDir) {
+            include "**/images/*"
+        }
+    }
+
+    // disable idprefix and set id separator so that the Bootstrap scrollspy
+    // plugin correctly finds headings
+    attributes "idprefix": "", "idseparator": "-"
+}
+
+asciidoctor.dependsOn(extractDocs)
+
+gulp_build.dependsOn copyDocs, prepareUserDocs, yarn_install
+
+assemble.dependsOn gulp_build
+clean.dependsOn cleanUserDocs, cleanNodeModules
+
+defaultTasks "build"

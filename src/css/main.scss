@@ -1,0 +1,709 @@
+@import "lato";
+@import "bootstrap_variables";
+@import "bootstrap_custom";
+
+body:not(.page-home) {
+  h2:not(:first-child), h3:not(:first-child), h4:not(:first-child) {
+    margin-top: 3rem;
+  }
+  h5:not(:first-child) {
+    margin-top: 1rem;
+  }
+}
+
+// fix issue in boostrap 4.0.0-alpha.6
+// buttons do not inherit font-family from body
+button, input, optgroup, select, textarea {
+  font: inherit;
+}
+
+// text color of focused button links should be white
+a.btn:focus {
+  color: #fff;
+}
+
+.container-main {
+  min-height: calc(100vh - 12rem /* footer 1 */ - 14rem /* footer 2 */ - 8rem /* header */ - 1rem /* buffer */);
+}
+
+.page-docs {
+  .lead+.card {
+    margin-top: 2rem;
+  }
+
+  .card {
+    margin-top: 1rem;
+  }
+
+  .btn-icon-separate {
+    padding-right: 0.4rem;
+  }
+  .dropdown-toggle {
+    padding-left: 0.15rem;
+  }
+}
+
+.page-user-docs {
+  .figure-center {
+    img {
+      display: inline-block;
+    }
+  }
+
+  .figure {
+    display: block;
+  }
+
+  h5 {
+    font-weight: bold;
+  }
+
+  #footnotes {
+    margin-top: 3rem;
+
+    hr {
+      width: 20%;
+      min-width: 6.25em;
+      margin: -.25em 0 .75em 0;
+      border-width: 1px 0 0 0;
+    }
+
+    .footnote {
+      font-size: 1rem;
+    }
+  }
+
+  #toc {
+    ul {
+      list-style-type: none;
+      padding-left: 1em;
+    }
+
+    &>ul {
+      padding-left: 0;
+    }
+
+    &.fixedsticky {
+      top: 20px;
+    }
+
+    li>ul {
+      display: none;
+    }
+
+    .nav-link {
+      padding: 0;
+    }
+
+    .nav-link.active+ul {
+      display: block;
+    }
+  }
+
+  #toccontainer {
+    // disable height property set by stickytoc.js
+    @include media-breakpoint-down(sm) {
+      height: auto !important;
+      padding-bottom: $spacer * 3;
+    }
+  }
+
+  // auto-add scrollbar if code blocks are too wide
+  .literalblock .content, .listingblock .content {
+    max-width: 100%;
+    overflow-x: auto;
+
+    pre code {
+      width: auto;
+      display: inline-block;
+      min-width: 100%;
+    }
+  }
+}
+
+// FIXME remove this workaround as soon as we can overwrite bootstrap variable
+.navbar-light .navbar-nav .nav-link {
+  color: rgba(0,0,0,.6);
+
+  &:hover {
+    color: rgba(0,0,0,.8);
+  }
+}
+
+.navbar-container {
+  background-color: $brand-dark-blue;
+  margin-bottom: 3 * $spacer;
+}
+
+#main-navbar {
+  z-index: 10; // put in front of welcome banner
+
+  .navbar-brand img {
+    @include media-breakpoint-down(sm) {
+      height: auto;
+      max-height: 50px;
+      max-width: calc(100% - 55px - #{$spacer}); // navbar-toggler width + margin
+    }
+  }
+}
+
+#footer-navbar {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+#goto-top-button {
+    display: none;
+    font-size: $font-size-base * 2;
+    position: fixed;
+    cursor: pointer;
+    z-index: 500;
+    line-height: 1em;
+    bottom: 40px;
+    right: 40px;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+
+    color: #aaa;
+    &:hover {
+        color: $gray-900;
+    }
+
+    @include media-breakpoint-down(md) {
+        display: none;
+    }
+}
+
+.page-home .navbar-container {
+  width: 100%;
+  padding-top: $spacer * 2;
+  background-color: $brand-dark-blue;
+  margin-bottom: 0;
+}
+
+.navbar-light {
+  .navbar-toggler {
+    color: #ccc;
+    &:hover, &:active, &:focus {
+      color: #fff;
+    }
+
+    cursor: pointer;
+    top: $spacer;
+    font-size: 2rem;
+  }
+
+  .navbar-nav {
+    li {
+      .nav-link {
+        color: #ccc;
+
+        &:hover, &:focus {
+          color: #fff;
+        }
+      }
+
+      &.active > .nav-link {
+        color: #fff;
+
+        &:hover, &:focus {
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+.navbar-container.has-title-large {
+  margin-bottom: 0;
+}
+
+.title-large {
+  background-color: $brand-dark-blue;
+  color: #fff;
+  text-align: center;
+  padding-top: 3em;
+  padding-bottom: 5em;
+  margin-bottom: 3em;
+
+  h1 {
+    font-size: 60px;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 50px;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 30px;
+  }
+
+  .lead {
+    font-size: 40px;
+    font-weight: 500;
+  }
+}
+
+.blog-post-row {
+  // make all columns in the row same height
+  @include media-breakpoint-up(md) {
+    display: flex;
+  }
+}
+
+.blog-post-block {
+  // make all columns in the row same height (see .blog-post-row)
+  @include media-breakpoint-up(md) {
+    display: flex;
+  }
+
+  // set max-height for jquery.dotdotdot.js
+  $elh: floor($lead-font-size * $line-height-base);
+  .ellipsis {
+    display: block;
+    max-height: $elh * 5;
+    overflow: hidden;
+  }
+
+  .date {
+    color: #999;
+  }
+}
+
+.blog-post-author {
+  line-height: 1.2em;
+}
+
+.pagination a:hover, .pagination a:focus {
+  text-decoration: none;
+}
+
+/* Welcome banner */
+#welcome {
+  height: 100vh;
+  max-width: 100%;
+  overflow: hidden;
+  margin-bottom: -$spacer;
+  position: relative;
+  top: calc(-84px - #{$spacer} * 2); // navbar height plus navbar padding-top
+  background-color: $brand-dark-blue;
+  color: #fff;
+
+  .whiteclouds {
+    position: absolute;
+    bottom: 0px;
+    left: -10%;
+    width: 120%;
+    z-index: 50;
+  }
+
+  .blueclouds {
+    position: absolute;
+    bottom: -10%;
+    width: 82%;
+    left: 18%;
+    z-index: 25;
+  }
+
+  .rocket {
+    height: 55vh;
+
+    // make rocket smaller on small screens
+    @include media-breakpoint-down(lg) {
+      height: 45vh;
+    }
+    @include media-breakpoint-down(md) {
+      height: 40vh;
+    }
+    @include media-breakpoint-down(sm) {
+      height: 35vh;
+    }
+  }
+
+  h1 {
+    font-size: 60px;
+    font-weight: 700;
+    padding: 0.7em 0 $spacer 0;
+    margin: 0;
+
+    // make h1 smaller on small screens
+    @include media-breakpoint-down(sm) {
+      font-size: 40px;
+    }
+    @media (max-height: 400px) {
+      font-size: 40px;
+    }
+
+    // change padding-top on smaller screens
+    @include media-breakpoint-down(lg) {
+      padding-top: 0.5em;
+    }
+    @include media-breakpoint-down(md) {
+      padding-top: 0.3em;
+    }
+    @include media-breakpoint-down(sm) {
+      padding-top: 0.7em;
+      padding-bottom: 0.7em;
+    }
+  }
+
+  h2 {
+    padding-bottom: $spacer * 3;
+    font-size: 40px;
+
+    // make h2 smaller in small screens
+    @include media-breakpoint-down(sm) {
+      padding-bottom: $spacer;
+      font-size: 30px;
+    }
+
+    // hide h2 if there is not enough space vertically
+    @media (max-height: 600px) {
+      display: none !important;
+    }
+  }
+
+  // center h1, h2 and rocket on small screens
+  @include media-breakpoint-down(sm) {
+    text-align: center;
+  }
+
+  // container containing h1, h2 and rocket
+  .container {
+    position: relative;
+    top: 47%;
+    transform: translateY(-45%);
+    z-index: 100;
+
+    @media (max-height: 500px) {
+      top: 55%;
+    }
+  }
+
+  // black background
+  .outer-space {
+    position: absolute;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: 0;
+  }
+
+  // blue background (overlays black one)
+  .blue-bg {
+    background-color: $brand-dark-blue;
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+    z-index: 1;
+  }
+}
+
+button.try {
+  font-size: 20px;
+  padding: 10px 20px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #fff;
+    color: $brand-dark-blue;
+  }
+}
+
+.nav-link.try {
+  border: $input-btn-border-width solid #ccc;
+  @extend .rounded;
+  padding: .4rem 1.1rem;
+  color: #ccc;
+  &:hover, &:focus {
+    color: #fff;
+    border-color: #fff;
+  }
+}
+
+.btn-icon-separate {
+  i {
+    margin-right: 0.4rem;
+    border-right: 1px solid #fff;
+    padding-right: 0.7rem;
+    line-height: 1.5;
+  }
+}
+
+.btn-primary {
+  background-color: #486583;
+  border-color: #486583;
+
+  &:hover, &:not(:disabled):not(.disabled):active, &:not(:disabled):not(.disabled):active,
+      .show>&.dropdown-toggle {
+    background-color: darken(#486583, 7.5%);
+    border-color: darken(#486583, 10%);
+  }
+}
+
+.btn-secondary {
+  border-color: #ccc;
+}
+
+.btn-outline-secondary {
+  color: $gray-900;
+  border-color: #ccc;
+  &:hover {
+    color: $gray-900;
+    background-color: $gray-200;
+  }
+}
+
+.featurette {
+  img {
+    width: 100%;
+    @include media-breakpoint-down(sm) {
+      padding: $spacer 0;
+    }
+  }
+
+  .plus {
+    color: $brand-orange;
+    font-weight: 700;
+  }
+}
+
+.featurette-divider {
+  margin: $spacer * 3 0;
+}
+
+.home-try-container {
+  background-color: $brand-dark-blue;
+  width: 100%;
+  color: #fff;
+  font-size: $h2-font-size;
+  padding: 3 * $spacer 0;
+  margin: $spacer * 3 0;
+
+  button {
+    float: right;
+  }
+
+  // center contents on small screens
+  @include media-breakpoint-down(sm) {
+    text-align: center;
+
+    button {
+      float: none;
+      margin-top: $spacer;
+    }
+  }
+}
+
+.page-try .try-cards .card {
+  @include media-breakpoint-up(lg) {
+    width: 50%;
+  }
+
+  img {
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3);
+  }
+}
+
+.news-column {
+  border-right: $hr-border-width $hr-border-color solid;
+
+  .lead {
+    padding-bottom: $spacer;
+  }
+
+  .btn {
+    margin-top: $spacer;
+  }
+
+  h5 {
+    color: $gray-700;
+  }
+}
+
+pre code {
+  background-color: $brand-dark-blue;
+  color: #fff;
+  padding: $spacer;
+  width: 100%;
+  display: block;
+  border-radius: $border-radius;
+}
+
+footer {
+  margin-top: 4 * $spacer;
+  padding-top: 2 * $spacer;
+  padding-bottom: 2 * $spacer;
+  color: #fff;
+  background-color: $brand-dark-blue;
+  font-size: 1.1rem;
+
+  .navbar-brand, .pseudo-brand {
+    text-transform: uppercase;
+    color: $gray-200;
+  }
+
+  .pseudo-brand {
+    @include media-breakpoint-up(sm) {
+      display: none;
+    }
+  }
+
+  @include media-breakpoint-down(xs) {
+    .navbar-expand {
+      .navbar-nav, .navbar-collapse {
+        flex-direction: column;
+      }
+    }
+  }
+
+  a {
+    color: $brand-orange;
+
+    &:focus {
+      color: $brand-orange;
+    }
+
+    &:hover, &:active {
+      color: #fff;
+    }
+  }
+
+  .fraunhofer-logo {
+    max-height: 4rem;
+  }
+
+  &.copyright {
+    margin-top: $spacer;
+    padding-top: 0;
+    padding-bottom: 10 * $spacer;
+    background-color: $body-bg;
+    color: $body-color;
+
+    p, img {
+      padding-top: $spacer;
+    }
+
+    a {
+      color: $body-color;
+      &:focus, &:hover, &:active {
+        color: $body-color;
+      }
+    }
+  }
+}
+
+.compare-editions {
+  width: 100%;
+  margin-top: $spacer * 4;
+  margin-bottom: $spacer * 3;
+
+  .compare-col-1 {
+    flex-grow: 1;
+    padding: $spacer 0 $spacer $spacer;
+  }
+
+  .compare-col-2, .compare-col-3 {
+    width: 25%;
+    min-width: 4rem;
+    margin-left: $spacer * 2;
+    background-color: $gray-100;
+    padding: $spacer 0;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+
+    @include media-breakpoint-down(xs) {
+      width: 15%;
+    }
+
+    @include media-breakpoint-down(sm) {
+      margin-left: $spacer;
+    }
+  }
+
+  .compare-head {
+    .compare-col-2, .compare-col-3 {
+      background-color: $brand-dark-blue;
+      color: $white;
+      font-weight: 700;
+      display: block;
+      text-align: center;
+    }
+  }
+
+  .compare-row {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid $gray-200;
+
+    &:first-child, &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .category-title {
+    padding-top: $spacer * 4;
+  }
+
+  .compare-category-row {
+    border-top: 3px solid $gray-200;
+    border-bottom: none;
+    &.first-row {
+      border-top: none;
+      .category-title {
+        padding-top: $spacer * 2;
+      }
+    }
+  }
+
+  .category-title {
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .description {
+    color: $gray-600;
+    font-weight: 300;
+    font-size: $font-size-base * 0.8;
+    max-width: 300px;
+    @include media-breakpoint-down(md) {
+      max-width: 200px;
+    }
+  }
+
+  .mdi {
+    font-size: $font-size-base * 2;
+  }
+
+  .mdi-check-circle-outline {
+    color: #2d8f50;
+  }
+
+  .mdi-close-circle-outline {
+    color: $brand-orange;
+  }
+
+  .btn {
+    margin: $spacer * 3 0 $spacer 0;
+  }
+
+  @include media-breakpoint-down(md) {
+    .btn {
+      margin: $spacer * 2 0 $spacer 0;
+    }
+  }
+
+  @include media-breakpoint-down(xs) {
+    .btn {
+      @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $font-size-base, $btn-border-radius-sm);
+      margin: $spacer 0;
+    }
+  }
+}
